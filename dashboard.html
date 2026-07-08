@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Sales Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .kpi-title {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .kpi-margin {
+            color: var(--accent-green);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .chart-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-container h2 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        canvas {
+            width: 100% !important;
+            max-height: 350px;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="header">
+        <h1>📊 Executive Analytics Dashboard</h1>
+        <div style="color: var(--text-muted); font-size: 0.875rem;">
+            Superstore Insights | Live Overview
+        </div>
+    </header>
+
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-title">Total Sales</div>
+            <div class="kpi-value" id="kpi-sales">$0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Total Profit</div>
+            <div class="kpi-value" id="kpi-profit">$0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Total Orders</div>
+            <div class="kpi-value" id="kpi-orders">0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Avg Order Value</div>
+            <div class="kpi-value" id="kpi-aov">$0</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Profit Margin</div>
+            <div class="kpi-value kpi-margin" id="kpi-margin">0%</div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <div class="chart-container full-width">
+            <h2>📈 Monthly Sales & Profit Trend</h2>
+            <canvas id="trendChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>🏷️ Sales by Category</h2>
+            <canvas id="categoryChart"></canvas>
+        </div>
+
+        <div class="chart-container">
+            <h2>🌍 Profit by Region</h2>
+            <canvas id="regionChart"></canvas>
+        </div>
+    </div>
+
+    <script src="dashboard_data.js"></script>
+    <script>
+        const formatCurrency = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(val);
+        const formatNumber = (val) => new Intl.NumberFormat('en-US').format(val);
+        document.getElementById('kpi-sales').innerText = formatCurrency(dashboardData.kpis.totalSales);
+        document.getElementById('kpi-profit').innerText = formatCurrency(dashboardData.kpis.totalProfit);
+        document.getElementById('kpi-orders').innerText = formatNumber(dashboardData.kpis.totalOrders);
+        document.getElementById('kpi-aov').innerText = formatCurrency(dashboardData.kpis.totalSales / dashboardData.kpis.totalOrders);
+
+        let margin = dashboardData.kpis.profitMargin.toFixed(2);
+        let marginEl = document.getElementById('kpi-margin');
+        marginEl.innerText = margin + '%';
+        if (margin < 10) marginEl.style.color = '#ef4444';
+
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
+        Chart.defaults.font.family = 'Inter';
+        new Chart(document.getElementById('trendChart'), {
+            type: 'line',
+            data: {
+                labels: dashboardData.trend.labels,
+                datasets: [
+                    {
+                        label: 'Total Sales ($)',
+                        data: dashboardData.trend.sales,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Total Profit ($)',
+                        data: dashboardData.trend.profit,
+                        borderColor: '#10b981',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: { mode: 'index', intersect: false }
+                }
+            }
+        });
+
+        new Chart(document.getElementById('categoryChart'), {
+            type: 'bar',
+            data: {
+                labels: dashboardData.category.labels,
+                datasets: [
+                    {
+                        label: 'Sales ($)',
+                        data: dashboardData.category.sales,
+                        backgroundColor: '#8b5cf6',
+                        borderRadius: 6
+                    },
+                    {
+                        label: 'Profit ($)',
+                        data: dashboardData.category.profit,
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+
+        new Chart(document.getElementById('regionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: dashboardData.region.labels,
+                datasets: [{
+                    data: dashboardData.region.profit,
+                    backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
