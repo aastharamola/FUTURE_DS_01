@@ -6,9 +6,11 @@ This project is a comprehensive Data Analytics workflow focused on a retail supe
 This project was built to simulate a real-world client engagement, transforming raw CSV data into a professional executive dashboard and business report.
 
 ## Live Dashboard Demo
-![Dashboard Demo](file:///c:/Users/DELL/Desktop/DS_01/dasbboard.mp4)
+<video src="dasbboard.mp4" controls="controls" style="max-width: 100%;">
+  Your browser does not support the video tag.
+</video>
 
-*(Note: If the video does not play inline, please view `dasbboard.mp4` in the project directory.)*
+*(Note: If the video does not play inline, please download or view `dasbboard.mp4` from the repository files.)*
 
 ## Business Problem
 The business needs to optimize its operations by identifying which products, categories, and regions are driving profitability, and which ones are underperforming. Without this insight, the company risks overspending on unprofitable marketing campaigns, maintaining excessive inventory of low-margin items, and losing out on high-value customer segments. 
