@@ -100,6 +100,7 @@ Average Order Value = DIVIDE([Total Sales], [Total Orders], 0)
 ├── eda_results.txt              # Output file containing raw KPI and EDA stats
 ├── dashboard.html               # Interactive Web Dashboard
 ├── dashboard_data.js            # Dashboard Data
-├── dasbboard.mp4                # Live Demo Screen Recording
+├── dashboard-1.png              # Dashboard Live Demo Image 1
+├── dashboard-2.png              # Dashboard Live Demo Image 2
 └── README.md                    # This documentation file
 ```
